@@ -85,27 +85,23 @@ logging.info("Starting {} {}".format(
     CONFIG.get("DEFAULT", "version")))
 
 
-
-if CONFIG.get("STRUCTURE", "excel").lower() == "true":
+# TODO: continue line-by-line review from here
+if CONFIG.get("INPUTS", "excel").lower() == "true":
     make_excel
     
-if CONFIG.get("DEFAULT", "mode") == "TEST":
-    test
+MODE = CONFIG.get("DEFAULT", "mode")
 
+if MODE == "PRODUCTION":
+    arcpy.env.overwriteOutput = False
+    # List topo sheet jpg names
+    arcpy.env.workspace = names_dir
+    logging.info("Listing topos...")
+    topos = arcpy.ListRasters()
 
 root = CONFIG.get("INPUTS", "root")
 
 # Set directory containing datasets and their features
 dataset_dir = os.path.join(root, "Datasets")
-
-# Set Projects folder (parent) to contain all output sheet-project folders
-prjbase_dir = os.path.join(root, "PROJECTS")
-
-# Set georeferenced rasters dir
-georef_dir = os.path.join(root, "WGS84_Topos.gdb")
-
-# Set footprint directory
-foot_dir = georef_dir + r"\Footprints"
 
 # Set directory of original topo sheet (.tif) names
 names_dir = os.path.join(root, "ClippedParsaTopos")
@@ -114,31 +110,14 @@ names_dir = os.path.join(root, "ClippedParsaTopos")
 # Set Spatial Reference (by name) for all output data
 spatial_ref_name = CONFIG.get("INPUTS", "spatial_reference")
 
-SR = arcpy.SpatialReference(spatial_ref_name)
-arcpy.env.outputCoordinateSystem = SR
-logging.info("Spatial Reference set: {0}".format(SR.name))
-
-# Prevent overwrites
-arcpy.env.overwriteOutput = False
-
-# Output message log
-
-
-
-
-
-
-print("Logging parameters set: messages will now be logged to: {}".format(log))
-logging.info("Setting paths...")
-
-
-
-# List topo sheet jpg names
-arcpy.env.workspace = names_dir
-logging.info("Listing topos...")
-topos = arcpy.ListRasters()
-
-
+try:
+    if MODE == "PRODUCTION":
+        SR = arcpy.SpatialReference(spatial_ref_name)
+        arcpy.env.outputCoordinateSystem = SR
+    logging.info("Spatial Reference set: {0}".format(SR.name))
+except Exception as e:
+    logging.error(e)
+    raise e
 
 logging.info("Paths & vars set")
 
@@ -179,17 +158,21 @@ def make_excel(path, name):
 def make_features(dataset_file):
     """Creates the datasets and features in datasets.ini config file."""
     for dataset in DATASETS.sections():
-        arcpy.CreateFeatureDataset_management(
-            arcpy.env.workspace, dataset, SR)
+        if MODE == "PRODUCTION":
+            arcpy.CreateFeatureDataset_management(
+                arcpy.env.workspace, dataset, SR)
         
         for feature_name, geom_type in DATASETS.items(dataset):
-            arcpy.CreateFeatureclass_management(
-                # Export to current workspace
-                arcpy.env.workspace,
-                # Feature
-                feature_name,
-                # Geometry type {POINT, LINE, POLYGON}
-                geom_type)
+            if MODE == "PRODUCTION":
+                arcpy.CreateFeatureclass_management(
+                    # Export to current workspace
+                    arcpy.env.workspace,
+                    # Feature
+                    feature_name,
+                    # Geometry type {POINT, LINE, POLYGON}
+                    geom_type)
+            else:
+                pass
     return
 
 

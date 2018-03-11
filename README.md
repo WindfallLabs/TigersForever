@@ -23,8 +23,8 @@ It may look something like this:
     * D4_2784_12D_Amlekhganj/  
         * D4_2784_12D_Amlekhganj.gdb  
         * D4_2784_12D_Amlekhganj.xlsx  
-        * Maps  
-        * Extras  
+        * Maps/  
+        * Extras/  
     * etc./  
         * etc.  
 
@@ -56,7 +56,8 @@ be used to create each project folder in root.
 
 [4] Turn on/off Excel file creation using the true or false options.  
 
-    excel = True
+    #excel = False
+	excel = True
 
 And set which fields to create (seperated by spaces)  
 
