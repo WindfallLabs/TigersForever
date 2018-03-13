@@ -4,14 +4,19 @@ License: [MIT](https://choosealicense.com/licenses/mit/)
 
 
 ## ABOUT:
-The default config creates a folder hierarchy for use with a Tigers Forever project:  
+This script and related config files builds a `.template` folder with:  
+* a geodatabase containing the datasets and featureclasses described in `datasets.ini`  
+* an Excel tracking file  
+* any other sub-folders as specified in the `config.ini` file (default: Maps, Extras)  
+This template is then copied and renamed for each raster in the input raster GDB (in `config.ini`).  
+Example folder hierarchy:  
 
-* root/			-- [1] This root folder must already exist  
+* root/                 -- [1] This root folder must already exist  
     * rasters.gdb		-- [2] This geodatabase must exist containing named rasters  
-    * map1/		-- Project folders are created using raster names (above)  
-        * map1.gdb	-- GDBs, datasets and featureclasses are made using datasets.ini  
+    * map1/		        -- Project folders are created using raster names (above)  
+        * map1.gdb	    -- GDBs, datasets and featureclasses are made using datasets.ini  
         * sub_folders/	-- [3] Subfolders to make in each project folder  
-        * map1.xlsx	-- [4] Excel tracking file  
+        * map1.xlsx	    -- [4] Excel tracking file  
     * map2/  
         * etc.  
         * etc.  
